@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +78,12 @@ class _NotificationPanelWidgetState extends State<NotificationPanelWidget> {
                         transparentBackground: true),
                   ),
                   initialUrlRequest: URLRequest(url: url),
+                  initialUserScripts: UnmodifiableListView([
+                    UserScript(
+                        source:
+                            "document.head.appendChild(document.createElement('style')).innerHTML='.facebook-connect-button { display: none; }';",
+                        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END),
+                  ]),
                   onWebViewCreated: (controller) =>
                       _activityFeedController = controller,
                   gestureRecognizers: {
