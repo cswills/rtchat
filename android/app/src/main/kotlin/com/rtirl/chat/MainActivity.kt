@@ -9,7 +9,11 @@ import androidx.annotation.NonNull
 import com.ryanheise.audioservice.AudioServicePlugin
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.dart.DartExecutor
+import io.flutter.embedding.engine.loader.FlutterLoader
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.view.FlutterCallbackInformation
+import io.flutter.view.FlutterMain
 
 class MainActivity : FlutterActivity() {
     private var foregroundService: ForegroundService? = null
@@ -27,6 +31,8 @@ class MainActivity : FlutterActivity() {
                 "com.rtirl.chat/foreground_service"
             )
 
+        var callbackHandle = 0L
+
         val connection = object : ServiceConnection {
             override fun onServiceConnected(
                 className: ComponentName,
@@ -34,7 +40,8 @@ class MainActivity : FlutterActivity() {
             ) {
                 val binder = service as ForegroundService.ForegroundServiceBinder
                 foregroundService = binder.getService()
-                foregroundService?.start()
+                foregroundService?.start(
+                    FlutterCallbackInformation.lookupCallbackInformation(callbackHandle))
             }
 
             override fun onServiceDisconnected(name: ComponentName) {
@@ -47,14 +54,16 @@ class MainActivity : FlutterActivity() {
             val intent = Intent(this, ForegroundService::class.java)
             when (call.method) {
                 "start" -> {
+                    callbackHandle = call.argument("callbackHandle")!!
                     bindService(intent, connection, Context.BIND_AUTO_CREATE)
-                    foregroundService?.start()
                     result.success(true)
                 }
                 "stop" -> {
-                    foregroundService?.stop()
                     stopService(intent)
                     result.success(false)
+                }
+                "set" -> {
+
                 }
                 else -> result.notImplemented()
             }

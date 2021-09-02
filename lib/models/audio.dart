@@ -4,7 +4,6 @@ import 'dart:core';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:rtchat/foreground_service_channel.dart';
 import 'package:rtchat/models/adapters/profiles.dart';
 import 'package:rtchat/models/channels.dart';
@@ -41,12 +40,8 @@ class AudioSource {
 
 class AudioModel extends ChangeNotifier {
   final List<AudioSource> _sources = [];
-  final Map<AudioSource, HeadlessInAppWebView> _views = {};
   late final Timer _speakerDisconnectTimer;
   final _audioCache = AudioCache();
-  final initialOptions = InAppWebViewGroupOptions(
-      crossPlatform: InAppWebViewOptions(
-          mediaPlaybackRequiresUserGesture: false, javaScriptEnabled: true));
   var _isForegroundServiceEnabled = false;
 
   Channel? _hostChannel;
@@ -103,13 +98,13 @@ class AudioModel extends ChangeNotifier {
       return;
     }
     _sources.add(source);
-    await _syncWebView(source);
+    ForegroundServiceChannel.setUrls(_activeUrls);
     notifyListeners();
   }
 
   Future<void> removeSource(AudioSource source) async {
     _sources.remove(source);
-    await _syncWebView(source);
+    ForegroundServiceChannel.setUrls(_activeUrls);
     notifyListeners();
   }
 
@@ -117,28 +112,17 @@ class AudioModel extends ChangeNotifier {
     final index = _sources.indexOf(source);
     if (index != -1) {
       _sources[index] = source.withMuted(!source.muted);
-      await _syncWebView(_sources[index]);
+      ForegroundServiceChannel.setUrls(_activeUrls);
     }
     notifyListeners();
   }
 
   Future<void> refreshAllSources() async {
-    for (final source in _sources) {
-      await _syncWebView(source);
-    }
+    
   }
 
-  Future<void> _syncWebView(AudioSource source) async {
-    _views[source]?.dispose();
-    if (source.muted) {
-      _views.remove(source);
-    } else {
-      final view = HeadlessInAppWebView(
-          initialOptions: initialOptions,
-          initialUrlRequest: URLRequest(url: source.url));
-      _views[source] = view;
-      await view.run();
-    }
+  Set<String> get _activeUrls {
+    return _sources.map((source) => source.url.toString()).toSet();
   }
 
   AudioModel.fromJson(Map<String, dynamic> json) {

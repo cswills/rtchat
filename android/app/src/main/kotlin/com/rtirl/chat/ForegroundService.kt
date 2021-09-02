@@ -9,9 +9,16 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.dart.DartExecutor
+import io.flutter.embedding.engine.loader.FlutterLoader
+import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodChannel
+import io.flutter.view.FlutterCallbackInformation
 
-class ForegroundService : Service() {
+class ForegroundService : Service(), EventChannel.StreamHandler {
     private val binder = ForegroundServiceBinder()
+    private val backgroundEngine = FlutterEngine(this)
 
     companion object {
         const val ONGOING_NOTIFICATION_ID = 68448
@@ -22,7 +29,7 @@ class ForegroundService : Service() {
         return binder
     }
 
-    fun start() {
+    fun start(callbackInfo: FlutterCallbackInformation) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
@@ -45,6 +52,19 @@ class ForegroundService : Service() {
             .setOngoing(true)
 
         startForeground(ONGOING_NOTIFICATION_ID, builder.build())
+
+        val args = DartExecutor.DartCallback(
+            assets,
+            FlutterLoader.getInstance().findAppBundlePath(),
+            callbackInfo
+        )
+        val channel =
+            EventChannel(
+                backgroundEngine.dartExecutor.binaryMessenger,
+                "com.rtirl.chat/audio_urls"
+            )
+        backgroundEngine.dartExecutor.executeDartCallback(args)
+        channel.setStreamHandler(this)
     }
 
     fun stop() {
@@ -55,5 +75,13 @@ class ForegroundService : Service() {
         fun getService(): ForegroundService {
             return this@ForegroundService
         }
+    }
+
+    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+
+    }
+
+    override fun onCancel(arguments: Any?) {
+
     }
 }
