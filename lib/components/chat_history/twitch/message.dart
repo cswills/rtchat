@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:linkify/linkify.dart';
 import 'package:provider/provider.dart';
 import 'package:rtchat/components/chat_history/twitch/badge.dart';
+import 'package:rtchat/components/chat_history/twitch/message_link_preview.dart';
 import 'package:rtchat/models/messages/tokens.dart';
 import 'package:rtchat/models/messages/twitch/message.dart';
 import 'package:rtchat/models/style.dart';
@@ -168,6 +169,31 @@ class TwitchMessageWidget extends StatelessWidget {
       final tokens = styleModel.compactMessages == CompactMessages.none
           ? model.tokenized
           : model.tokenized.compacted;
+
+      var hasLink = false;
+      var linkUrl = "";
+      for (final token in tokens) {
+        if (token is LinkToken && isTwitchClip(token.text)) {
+          hasLink = true;
+          linkUrl = token.text;
+          break;
+        }
+      }
+
+      if (hasLink) {
+        return Opacity(
+          opacity: model.deleted ? 0.6 : 1.0,
+          child: TwitchMessageLinkPreviewWidget(
+            children: [
+              ...children,
+              ...tokens
+                  .expand((token) => _render(context, styleModel, token))
+                  .toList(),
+            ],
+            url: linkUrl,
+          ),
+        );
+      }
 
       return Opacity(
         opacity: model.deleted ? 0.6 : 1.0,

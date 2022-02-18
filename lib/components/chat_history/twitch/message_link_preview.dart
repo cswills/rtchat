@@ -1,6 +1,7 @@
 import 'package:metadata_fetch/metadata_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image/flutter_image.dart';
+import 'package:async/async.dart';
 
 class _TwitchClipData {
   final String? imageUrl;
@@ -15,55 +16,74 @@ class _TwitchClipData {
       required this.description});
 }
 
-Future<_TwitchClipData> fetchClipData(String url) async {
-  final data = await MetadataFetch.extract(url);
-  return _TwitchClipData(
-      imageUrl: data!.image,
-      url: data.url,
-      title: data.title,
-      description: data.description);
-}
+class _TwitchMessageLinkPreviewWidgetState
+    extends State<TwitchMessageLinkPreviewWidget> {
+  late Future<dynamic> fetchClipData;
 
-class TwitchMessageLinkPreviewWidget extends StatelessWidget {
-  final TextStyle messageStyle;
-  final List<InlineSpan> children;
-  final String url;
+  @override
+  void initState() {
+    fetchClipData = _fetchClipData(widget.url);
+    super.initState();
+  }
 
-  const TwitchMessageLinkPreviewWidget(
-      {required this.messageStyle,
-      required this.children,
-      required this.url,
-      Key? key})
-      : super(key: key);
+  _fetchClipData(String url) async {
+    return widget._memoizer.runOnce(() async {
+      print("fetching: ${url}");
+      final data = await MetadataFetch.extract(url);
+      final res = _TwitchClipData(
+          imageUrl: data!.image,
+          url: data.url,
+          title: data.title,
+          description: data.description);
+      return res;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    String url = widget.url;
     return Column(
       children: [
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Text.rich(
-              TextSpan(style: messageStyle, children: children),
+              TextSpan(children: widget.children),
             )),
         Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: FutureBuilder(
-                future: fetchClipData(url),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState != ConnectionState.done) {
-                    return const Card(child: CircularProgressIndicator());
-                  }
-                  return Card(
-                    child: ListTile(
-                      leading: Image(
-                          image: NetworkImageWithRetry(snapshot.data.imageUrl)),
-                      title: Text(snapshot.data.title),
-                      subtitle: Text(snapshot.data.description),
-                      isThreeLine: true,
-                    ),
-                  );
-                }))
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: FutureBuilder(
+            future: fetchClipData,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (!snapshot.hasData) {
+                return const Card(child: CircularProgressIndicator());
+              }
+              return Card(
+                child: ListTile(
+                  leading: Image(
+                      image: NetworkImageWithRetry(snapshot.data.imageUrl)),
+                  title: Text(snapshot.data.title),
+                  subtitle: Text(snapshot.data.description),
+                  isThreeLine: true,
+                ),
+              );
+            },
+          ),
+        )
       ],
     );
   }
+}
+
+class TwitchMessageLinkPreviewWidget extends StatefulWidget {
+  final List<InlineSpan> children;
+  final String url;
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
+
+  TwitchMessageLinkPreviewWidget(
+      {required this.children, required this.url, Key? key})
+      : super(key: key);
+
+  @override
+  _TwitchMessageLinkPreviewWidgetState createState() =>
+      _TwitchMessageLinkPreviewWidgetState();
 }
