@@ -38,15 +38,17 @@ async function main() {
     "twitch"
   );
 
-  runTwitchAgent(firebase, AGENT_ID).then((close) => {
-    for (const signal of ["SIGINT", "SIGTERM", "uncaughtException"]) {
-      process.on(signal, async (err) => {
-        log.error(err, "received %s", signal);
-        await close();
-        process.exit(0);
-      });
-    }
-  });
+  const agents = [runTwitchAgent(firebase, AGENT_ID)];
+
+  for (const signal of ["SIGINT", "SIGTERM", "uncaughtException"]) {
+    process.on(signal, async (err) => {
+      log.error(err, "received %s", signal);
+      await firebase.releaseAll("twitch", AGENT_ID);
+      process.exit(0);
+    });
+  }
+  
+  await Promise.all(agents);
 }
 
 main().catch((err) => {
