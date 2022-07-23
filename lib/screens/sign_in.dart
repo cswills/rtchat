@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:rtchat/models/user.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 
-final url = Uri.https('chat.rtirl.com', '/auth/twitch/redirect');
+final url = Uri.https('rtchatdev.web.app', '/auth/twitch/redirect');
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);

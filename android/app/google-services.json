@@ -1,50 +1,35 @@
 {
   "project_info": {
-    "project_number": "832669896677",
-    "firebase_url": "https://rtchat-47692-default-rtdb.firebaseio.com",
-    "project_id": "rtchat-47692",
-    "storage_bucket": "rtchat-47692.appspot.com"
+    "project_number": "882758136725",
+    "firebase_url": "https://rtchatdev-default-rtdb.firebaseio.com",
+    "project_id": "rtchatdev",
+    "storage_bucket": "rtchatdev.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:832669896677:android:9a9d7b799cea587c60290c",
+        "mobilesdk_app_id": "1:882758136725:android:575a13a90c471e89eefc9c",
         "android_client_info": {
           "package_name": "com.rtirl.chat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "832669896677-bsjr7u9hpn4m7fg2nl0mgb6uvrjudct1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.rtirl.chat",
-            "certificate_hash": "a345c763fd3264c8eb9c83eb0806919bce0c122f"
-          }
-        },
-        {
-          "client_id": "832669896677-lcajc2980dn2ddc2adei7u0v3qdqln1p.apps.googleusercontent.com",
+          "client_id": "882758136725-4jd6acn7sb9a5l336suiilb6s8sg7lc4.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDv7Q7_HDpx9Us4LAMObNPV7k8XyCmJQVA"
+          "current_key": "AIzaSyCffdCJpn-1Cpzq-DJ7YtK07Sxv6H32qUU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "832669896677-lcajc2980dn2ddc2adei7u0v3qdqln1p.apps.googleusercontent.com",
+              "client_id": "882758136725-4jd6acn7sb9a5l336suiilb6s8sg7lc4.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "832669896677-30itsabb94b1i9qd2uoo601tp4d4tlks.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.rtirl.chat"
-              }
             }
           ]
         }

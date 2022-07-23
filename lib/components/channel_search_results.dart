@@ -5,7 +5,7 @@ import 'package:rtchat/models/channels.dart';
 
 final _search = FirebaseFunctions.instance.httpsCallable("search");
 
-final url = Uri.https('chat.rtirl.com', '/auth/twitch/redirect');
+final url = Uri.https('rtchatdev.web.app', '/auth/twitch/redirect');
 
 class SearchResult {
   final String channelId;

@@ -5,7 +5,7 @@ import { FirebaseAdapter } from "./adapters/firebase";
 import { runTwitchAgent } from "./agents/twitch";
 import { log } from "./log";
 
-const PROJECT_ID = process.env["PROJECT_ID"] || "rtchat-47692";
+const PROJECT_ID = process.env["PROJECT_ID"] || "rtchatdev";
 
 async function main() {
   if (!process.env["GOOGLE_APPLICATION_CREDENTIALS"]) {
@@ -13,7 +13,7 @@ async function main() {
     // credentials are not set, initialize the app from secret manager.
     // TODO: why don't gcp default credentials work?
     const [version] = await client.accessSecretVersion({
-      name: "projects/rtchat-47692/secrets/firebase-service-account/versions/latest",
+      name: "projects/rtchatdev/secrets/firebase-service-account/versions/latest",
     });
     const secret = version.payload?.data?.toString();
     if (!secret) {
@@ -36,7 +36,7 @@ async function main() {
     admin.database(),
     admin.firestore(),
     "twitch",
-    new Set([]) // add a username here to only join that channel for development.
+    new Set(['qubecat']) // add a username here to only join that channel for development.
   );
 
   runTwitchAgent(firebase, AGENT_ID).then((close) => {

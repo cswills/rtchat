@@ -16,7 +16,7 @@ class StreamPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final urlString = (Platform.isAndroid)
         ? "http://localhost:8080/assets/twitch-player.html?channel=$channelDisplayName"
-        : "https://player.twitch.tv/?channel=$channelDisplayName&parent=chat.rtirl.com&muted=true&quality=160p30";
+        : "https://player.twitch.tv/?channel=$channelDisplayName&parent=rtchatdev.web.app&muted=true&quality=160p30";
 
     return InAppWebView(
       initialOptions: InAppWebViewGroupOptions(

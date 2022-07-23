@@ -5,7 +5,7 @@ import 'package:rtchat/components/channel_search_bottom_sheet.dart';
 import 'package:rtchat/models/channels.dart';
 import 'package:rtchat/themes.dart';
 
-final url = Uri.https('chat.rtirl.com', '/auth/twitch/redirect');
+final url = Uri.https('rtchatdev.web.app', '/auth/twitch/redirect');
 
 class OnboardingScreen extends StatelessWidget {
   final void Function(Channel) onChannelSelect;

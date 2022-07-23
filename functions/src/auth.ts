@@ -34,7 +34,7 @@ declare module "express-session" {
 
 const HOST =
   process.env.NODE_ENV === "production"
-    ? "https://chat.rtirl.com"
+    ? "https://rtchatdev.web.app"
     : "http://localhost:5000";
 
 app.get("/auth/twitch/redirect", (req, res) => {

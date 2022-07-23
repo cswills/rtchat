@@ -16,7 +16,7 @@ export async function getTwitchOAuthConfig(): Promise<
   if (!secret) {
     // pull from secret manager.
     const [version] = await client.accessSecretVersion({
-      name: "projects/rtchat-47692/secrets/twitch-client-secret/versions/latest",
+      name: "projects/rtchatdev/secrets/twitch-client-secret/versions/latest",
     });
     secret = version.payload?.data?.toString();
   }

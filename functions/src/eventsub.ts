@@ -54,7 +54,7 @@ function createEventsub(token: string, type: string, twitchUserId: string) {
       transport: {
         method: "webhook",
         callback:
-          "https://us-central1-rtchat-47692.cloudfunctions.net/eventsub",
+          "https://us-central1-rtchatdev.cloudfunctions.net/eventsub",
         secret: TWITCH_CLIENT_SECRET,
       },
     }),
