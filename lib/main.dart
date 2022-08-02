@@ -238,6 +238,7 @@ class _AppState extends State<App> {
       child: Consumer<LayoutModel>(builder: (context, layoutModel, child) {
         return MaterialApp(
           title: 'RealtimeChat',
+          debugShowCheckedModeBanner: false,
           theme: Themes.lightTheme,
           darkTheme: Themes.darkTheme,
           themeMode: layoutModel.themeMode,

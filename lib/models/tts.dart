@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:rtchat/models/bytes.dart';
 import 'package:rtchat/models/messages/message.dart';
 import 'package:rtchat/models/messages/tokens.dart';
 import 'package:rtchat/models/messages/twitch/message.dart';
@@ -20,6 +24,7 @@ class TtsModel extends ChangeNotifier {
   var _language = Language();
   List<String> voices = [];
   final Map<String, dynamic> _voice = {};
+  var _isStandard = true;
   var _isSupportedLanguage = false;
   var _isRandomVoiceEnabled = true;
   var _isBotMuted = false;
@@ -186,6 +191,15 @@ class TtsModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get isStandard {
+    return _isStandard;
+  }
+
+  set isStandard(bool value) {
+    _isStandard = value;
+    notifyListeners();
+  }
+
   bool get isEmoteMuted {
     return _isEmoteMuted;
   }
@@ -280,13 +294,36 @@ class TtsModel extends ChangeNotifier {
 
     if ((_isEnabled || model is SystemMessageModel) &&
         _pending.contains(model.messageId)) {
-      try {
-        await _tts.setSpeechRate(_speed);
-        await _tts.setPitch(_pitch);
-        await _tts.awaitSpeakCompletion(true);
-        await _tts.speak(vocalization);
-      } catch (e, st) {
-        FirebaseCrashlytics.instance.recordError(e, st);
+      if (_isStandard) {
+        try {
+          await _tts.setSpeechRate(_speed);
+          await _tts.setPitch(_pitch);
+          await _tts.awaitSpeakCompletion(true);
+          await _tts.speak(vocalization);
+        } catch (e, st) {
+          FirebaseCrashlytics.instance.recordError(e, st);
+        }
+      } else {
+        String? randomVoice;
+        if (model is TwitchMessageModel) {
+          1 / 0;
+          var name = model.author.displayName;
+          BigInt num = BigInt.parse(sha1.convert(utf8.encode(name!)).toString(),
+              radix: 16);
+          randomVoice =
+              voices[num.remainder(BigInt.from(voices.length)).toInt()];
+        }
+        final response =
+            await FirebaseFunctions.instance.httpsCallable("synthesize")({
+          "voice": randomVoice ?? "en-US-WaveNet-F",
+          "language": "en",
+          "text": vocalization,
+          "rate": _speed * 2,
+        });
+        final bytes = const Base64Decoder().convert(response.data);
+        var audioPlayer = AudioPlayer();
+        await audioPlayer.setAudioSource(BufferAudioSource(bytes));
+        await audioPlayer.play();
       }
     }
 

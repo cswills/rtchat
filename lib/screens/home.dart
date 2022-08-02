@@ -174,7 +174,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
-
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
@@ -296,6 +295,46 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         return Container();
                       }
                     }),
+                    Consumer<TtsModel>(
+                      builder: (context, ttsModel, child) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: ToggleButtons(
+                            constraints: BoxConstraints(
+                                minWidth:
+                                    (MediaQuery.of(context).size.width - 36) /
+                                        2,
+                                minHeight: 48),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(24.0)),
+                            onPressed: (index) {
+                              switch (index) {
+                                case 0:
+                                  ttsModel.isStandard = true;
+                                  break;
+                                case 1:
+                                  ttsModel.isStandard = false;
+                                  break;
+                              }
+                            },
+                            isSelected: [
+                              ttsModel.isStandard,
+                              !ttsModel.isStandard,
+                            ],
+                            children: const [
+                              Text(
+                                'standard tts',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              Text(
+                                'enhanced tts',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                     Expanded(
                         child: DiscoWidget(
                             isEnabled: widget.isDiscoModeEnabled,
