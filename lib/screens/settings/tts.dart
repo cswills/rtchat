@@ -1,13 +1,12 @@
 import 'dart:convert';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:rtchat/models/messages/message.dart';
 import 'package:rtchat/models/tts.dart';
-import 'package:rtchat/models/tts/bytes_audio_source.dart';
 
 class TextToSpeechScreen extends StatelessWidget {
   const TextToSpeechScreen({Key? key}) : super(key: key);
@@ -159,8 +158,7 @@ class TextToSpeechScreen extends StatelessWidget {
                           "kevin calmly and collectively consumes cheesecake",
                     });
                     final bytes = const Base64Decoder().convert(response.data);
-                    audioPlayer.setAudioSource(BytesAudioSource(bytes));
-                    audioPlayer.play();
+                    audioPlayer.playBytes(bytes);
                   } else {
                     model.say(
                         SystemMessageModel(

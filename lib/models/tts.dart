@@ -3,18 +3,17 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:rtchat/models/messages/message.dart';
 import 'package:rtchat/models/messages/tokens.dart';
 import 'package:rtchat/models/messages/twitch/message.dart';
 import 'package:rtchat/models/messages/twitch/user.dart';
-import 'package:rtchat/models/tts/bytes_audio_source.dart';
 import 'package:rtchat/models/tts/language.dart';
 import 'package:rtchat/models/user.dart';
 
@@ -345,9 +344,8 @@ class TtsModel extends ChangeNotifier {
           "pitch": pitch ?? 0,
         });
         final bytes = const Base64Decoder().convert(response.data);
-        await audioPlayer.setAudioSource(BytesAudioSource(bytes));
-        await audioPlayer.play();
-        await Future.delayed(audioPlayer.duration ?? const Duration());
+        await audioPlayer.playBytes(bytes);
+        await audioPlayer.onPlayerCompletion.first;
       }
     }
 
