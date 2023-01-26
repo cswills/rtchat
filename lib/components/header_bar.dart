@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:rtchat/components/image/resilient_network_image.dart';
 import 'package:rtchat/models/adapters/channels.dart';
 import 'package:rtchat/models/channels.dart';
 import 'package:rtchat/models/layout.dart';
@@ -105,6 +107,30 @@ class _HeaderBarWidgetState extends State<HeaderBarWidget> {
     return AppBar(
         title: GestureDetector(
             onTap: () => setState(() => _locked = !_locked),
+            onLongPress: () => showModalBottomSheet<void>(
+                  backgroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  context: context,
+                  builder: (BuildContext context) {
+                    String channelUrl = "";
+                    switch (widget.channel.provider) {
+                      case "twitch":
+                        channelUrl =
+                            "https://twitch.tv/${widget.channel.displayName}";
+                    }
+                    return SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: QrImage(
+                          data: channelUrl,
+                        ),
+                      ),
+                    );
+                  },
+                ),
             child: StreamBuilder<ChannelMetadata?>(
                 stream: ChannelsAdapter.instance.forChannel(widget.channel),
                 builder: (context, snapshot) {
